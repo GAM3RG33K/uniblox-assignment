@@ -1,7 +1,12 @@
 const express = require('express');
-const products = require('./db');
+const bodyParser = require('body-parser');
+const products = require('./src/db');
+const { addProductToCart, getCart } = require('./src/order_manager');
 const lodash = require('lodash');
 const app = express();
+
+app.use(bodyParser.json());
+
 const cors = require('cors');
 
 const corsOptions = {
@@ -14,6 +19,9 @@ const corsOptions = {
     },
 };
 app.use(cors(corsOptions));
+
+
+
 
 // Define the '/' route to respond with a welcome message
 app.get('/', (req, res) => {
@@ -30,10 +38,34 @@ app.get('/api/products', (req, res) => {
     });
 });
 
+app.get('/api/cart', async (req, res) => {
+    const { user_id } = req.query;
+    const response = await getCart(user_id);
+    const statusCode = (!response.error) ? 200 : 500;
+
+    if (statusCode == 200) {
+        const cart = response.cart;
+        console.log(`total products in cart: ${cart.length}`)
+        res.status(statusCode).json({
+            cart,
+            'count': cart.length,
+        });
+    } else {
+        res.status(statusCode).json(response);
+    }
+});
+
+app.post('/api/cart/add', async (req, res) => {
+    const { user_id, product_id } = req.body;
+    const response = await addProductToCart(user_id, product_id);
+
+    const statusCode = !(response.error || '') ? 200 : 500;
+    res.status(statusCode).json(response);
+});
 
 const port = 9001;
 app.listen(port, async () => {
     console.log(`Server running at http://localhost:${port}`);
 });
 
-module.export = app;
+module.exports = app;

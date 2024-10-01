@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { fetchProducts } from './api';
+import { fetchProducts, addToCard, fetchCart } from './api';
 import { FaShoppingCart } from 'react-icons/fa';
-import { v4 as uuidv4 } from 'uuid';
+import { userId } from './index';
 
 const App = () => {
   const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState({});
+  const [cart, setCart] = useState([]);
 
+  const fetchCartItems = async (userId) => {
+    const response = await fetchCart(userId);
+    if (!response) {
+      return;
+    }
+
+    return response;
+  };
   useEffect(() => {
     const getProducts = async () => {
       const fetchedProducts = await fetchProducts();
@@ -15,15 +23,39 @@ const App = () => {
     getProducts();
   }, []);
 
-  const addToCart = (product) => {
-    setCart((prevCart) => ({
+  useEffect(() => {
+    const updateCart = async () => {
+      const cart = await fetchCartItems(userId);
+      if (cart) {
+        const appCart = cart.map((product) => product.id);
+        setCart(appCart);
+      }
+    };
+    updateCart();
+  }, []);
+
+  const addProductToCart = async (product) => {
+
+    const response = await addToCard(userId, product.id);
+    if (!response) {
+      return;
+    }
+
+
+    setCart((prevCart) => [
       ...prevCart,
-      [product.id]: (prevCart[product.id] || 0) + 1,
-    }));
+      product.id,
+    ]);
   };
 
   const getTotalCartItems = () => {
-    return Object.values(cart).reduce((total, quantity) => total + quantity, 0);
+    return Object.values(cart).length;
+  };
+
+
+
+  const getTotalProductCount = (productId) => {
+    return cart.filter((product) => product === productId).length;
   };
 
   return (
@@ -49,9 +81,9 @@ const App = () => {
               <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
               <button
                 className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-                onClick={() => addToCart(product)}
+                onClick={() => addProductToCart(product)}
               >
-                Add to Cart {cart[product.id] ? `(${cart[product.id]})` : ''}
+                Add to Cart {getTotalProductCount(product.id) > 0 ? `(${getTotalProductCount(product.id)})` : ''}
               </button>
             </div>
           </div>
