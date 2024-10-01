@@ -112,7 +112,7 @@ const App = () => {
       <div className="container mx-auto px-4 py-8">
         <header className="flex justify-between items-center mb-8">
           <Link to="/">
-            <h1 className="text-3xl font-bold">Our Products</h1>
+            <h1 className="text-3xl font-bold">Shoppers Point</h1>
           </Link>
           <Link to="/cart" className="relative">
             <FaShoppingCart className="text-2xl" />

@@ -36,3 +36,23 @@ export const addToCard = async (userId, productId) => {
         return [];
     }
 };
+
+
+export const applyDiscountCoupon = async (userId, discountCode, cart) => {
+    try {
+
+        console.log(`applyDiscountCoupon: discountCode : ${discountCode}`);
+        const response = await axios.post(`${API_URL}/order/apply-discount`, {
+            user_id: userId,
+            discount_coupon: discountCode,
+            cartItems: Object.values(cart),
+        });
+
+        console.log(`applyDiscountCoupon: response : ${JSON.stringify(response.data, 4)}`);
+        return response.data;
+
+    } catch (error) {
+        console.error('Error while applying discount coupon to cart :', error);
+        return { error: error.response.data.error };
+    }
+};
