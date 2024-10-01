@@ -4,13 +4,15 @@
   "description": "A demo of working implementation of the assignment provided here: https://github.com/neustackapp/assignment/blob/main/README.md",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node --watch index.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
     "express": "^4.21.0",
+    "lodash": "^4.17.21",
     "uuid": "^10.0.0"
   }
 }
