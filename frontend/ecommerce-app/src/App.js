@@ -5,7 +5,7 @@ import { userId } from './index';
 
 const App = () => {
   const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState({});
 
   const fetchCartItems = async (userId) => {
     const response = await fetchCart(userId);
@@ -27,7 +27,21 @@ const App = () => {
     const updateCart = async () => {
       const cart = await fetchCartItems(userId);
       if (cart) {
-        const appCart = cart.map((product) => product.id);
+        const appCart = {};
+
+
+        cart.forEach((product) => {
+          if (appCart[product.id]) return;
+
+          const productCount = cart.filter((p) => product.id === p.id).length;
+          appCart[product.id] = {
+            ...product,
+            count: productCount,
+          };
+
+        });
+
+        console.log(`appCart: ${JSON.stringify(appCart, 4)}`)
         setCart(appCart);
       }
     };
@@ -41,21 +55,27 @@ const App = () => {
       return;
     }
 
-
-    setCart((prevCart) => [
+    setCart((prevCart) => ({
       ...prevCart,
-      product.id,
-    ]);
+      [product.id]: {
+        ...product,
+        count: (prevCart[product.id]?.count || 0) + 1,
+      },
+    }));
   };
 
   const getTotalCartItems = () => {
-    return Object.values(cart).length;
+    var cartItemsCount = 0;
+    Object.values(cart).forEach((product) => {
+      cartItemsCount += (product.count || 0);
+    });
+    return cartItemsCount;
   };
 
 
 
   const getTotalProductCount = (productId) => {
-    return cart.filter((product) => product === productId).length;
+    return (cart[productId] || {}).count;
   };
 
   return (
