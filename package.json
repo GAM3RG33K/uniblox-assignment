@@ -1,0 +1,16 @@
+{
+  "name": "uniblox-assignment",
+  "version": "1.0.0",
+  "description": "A demo of working implementation of the assignment provided here: https://github.com/neustackapp/assignment/blob/main/README.md",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.0",
+    "uuid": "^10.0.0"
+  }
+}
