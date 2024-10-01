@@ -1,12 +1,26 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { applyDiscountCoupon } from '../api';
+import { Link, useNavigate } from 'react-router-dom';
+import { applyDiscountCoupon, checkout } from '../api';
 import { userId } from '..';
 
 const Cart = ({ cart, updateQuantity, removeFromCart }) => {
     const [discountCode, setDiscountCode] = useState('');
     const [discountMessage, setDiscountMessage] = useState('');
     const [discountAmount, setDiscountAmount] = useState(0);
+
+    const [alert, setAlert] = useState({ show: false, message: '', isError: false });
+
+    const navigate = useNavigate();
+
+    const closeAlert = () => {
+        if (alert.show && !alert.isError) {
+            navigate('/');
+
+            // Force a page refresh
+            window.location.reload();
+        }
+        setAlert({ ...alert, show: false });
+    };
 
 
     const resetDiscount = () => {
@@ -36,6 +50,8 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
         return subtotal - discountAmount;
     };
 
+
+
     const applyDiscount = async (userId, couponCode) => {
 
         try {
@@ -53,9 +69,39 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
         }
     };
 
+    const checkoutOrder = async (userId) => {
+        try {
+            const response = await checkout(userId, discountCode, cart);
+            if (response && !response.error) {
+                setAlert({ show: true, message: response.message, isError: false });
+            } else {
+                setAlert({ show: true, message: response.error, isError: true });
+            }
+        } catch (error) {
+            console.error('Error placing order:', error);
+            setAlert({ show: true, message: 'Unable to place order right now, Please try again later!', isError: true });
+        }
+    };
+
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
+            {alert.show && (
+                <div className={`fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50`}>
+                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+                        <h2 className={`text-lg font-semibold mb-2 ${alert.isError ? 'text-red-600' : 'text-green-600'}`}>
+                            {alert.isError ? 'Error' : 'Success'}
+                        </h2>
+                        <p className="mb-4">{alert.message}</p>
+                        <button
+                            onClick={closeAlert}
+                            className="bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-600 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
             {Object.keys(cart).length === 0 ? (
                 <p>Your cart is empty.</p>
             ) : (
@@ -103,7 +149,7 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
                             />
                             <button
                                 onClick={() => applyDiscount(userId, discountCode)}
-                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                                className="bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-600 transition-colors"
                             >
                                 Apply
                             </button>
@@ -115,7 +161,10 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
                         )}
                         <p className="text-m mt-4">SubTotal: ${getSubTotalPrice().toFixed(2)}</p>
                         <p className="text-xl font-bold mt-4">Total: ${getTotalPrice().toFixed(2)}</p>
-                        <button className="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors">
+                        <button
+                            onClick={() => checkoutOrder(userId)}
+                            className="mt-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+                        >
                             Proceed to Checkout
                         </button>
                     </div>

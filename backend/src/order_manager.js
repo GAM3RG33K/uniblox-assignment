@@ -1,4 +1,5 @@
 const lodash = require('lodash');
+const { v4: uuidv4 } = require('uuid');
 
 const { products, discounts, DISCOUNT_TYPE_PERCENTAGE, NTH_NUMBER } = require('./db');
 
@@ -75,6 +76,29 @@ async function getOrdersForUser(user_id) {
 
 
 
+async function getOrdersFromID(orderId) {
+
+    // check for valid order
+    if (!orderId) {
+        return { error: `Invalid order id provided` };
+    }
+
+    const allOrders = lodash.cloneDeep(Object.values(orders));
+
+    if (!allOrders || !allOrders.length) {
+        return { error: `No order details found provided order id` };
+    }
+
+    const orders = allOrders.filter((order) => order.id == orderId);
+    if (!orders || !orders.length) {
+        return { error: `No order details found provided order id` };
+    }
+
+    return { order: orders[0] };
+};
+
+
+
 const getSubTotalPrice = (cartItems) => {
     if (!(cartItems && cartItems.length)) return 0;
     const subtotal = cartItems.reduce((total, item) => total + item.price * item.count, 0);
@@ -100,7 +124,7 @@ const getOrdersCountForUser = async (user_id) => {
 
 const checkDiscountEligibility = async (user_id) => {
     const userOrdersCount = await getOrdersCountForUser(user_id);
-    const isEligibleForDiscount = userOrdersCount == 0 || (userOrders.orders.length % NTH_NUMBER == 0);
+    const isEligibleForDiscount = userOrdersCount == 0 || (userOrdersCount % NTH_NUMBER == 0);
     return isEligibleForDiscount;
 };
 
@@ -127,10 +151,61 @@ async function applyDiscount(user_id, discount_coupon, cartItems) {
         const discount = discounts[discount_coupon];
 
         const discountAmount = getDiscountAmount(subtotal, discount);
+
+        if (subtotal < discountAmount) {
+            return { error: 'Discount can not be applied on this order' };
+        }
         return { discountAmount, message: `Discount applied: $${discountAmount.toFixed(2)}` };
     }
 
     return { error: 'Discount coupon is invalid' };
 };
 
-module.exports = { addProductToCart, getCart, applyDiscount };
+
+async function checkout(user_id, discount_coupon, cartItems) {
+
+    // check for authentication and valid discount coupon
+    if (!user_id || !cartItems) {
+        return { error: 'Invalid request' };
+    }
+
+    const subtotal = getSubTotalPrice(cartItems);
+
+
+    var discountAmount = 0;
+
+    var discount = {};
+    if (discount_coupon) {
+        discount = discounts[discount_coupon];
+        discountAmount = getDiscountAmount(subtotal, discount);
+    }
+
+    // If subtotal is 0 then no discount can be applied
+    if (subtotal <= 0) {
+        subtotal = 0;
+        discountAmount = 0;
+    }
+
+    const order_id = uuidv4();
+    var order = {
+        id: order_id,
+        products: lodash.cloneDeep(cartItems),
+        subtotal,
+        discountAmount,
+        total: subtotal - discountAmount,
+        discount,
+    }
+
+    // Create an empty cart
+    if (!orders[user_id]) {
+        orders[user_id] = [];
+    }
+
+    orders[user_id].push(order);
+
+    // Clear user cart
+    carts[user_id] = {};
+    return { message: `Congratulations Order Placed!\n\nOrder ID: ${order_id}` };
+};
+
+module.exports = { addProductToCart, getCart, applyDiscount, checkout, getOrdersFromID };

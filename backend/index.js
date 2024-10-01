@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { products } = require('./src/db');
-const { addProductToCart, getCart, applyDiscount } = require('./src/order_manager');
+const { addProductToCart, getCart, applyDiscount, checkout, getOrdersFromID } = require('./src/order_manager');
 const lodash = require('lodash');
 const app = express();
 
@@ -64,9 +64,26 @@ app.post('/api/cart/add', async (req, res) => {
 });
 
 app.post('/api/order/apply-discount', async (req, res) => {
-    const { user_id, discount_coupon, cartItems} = req.body;
+    const { user_id, discount_coupon, cartItems } = req.body;
     const response = await applyDiscount(user_id, discount_coupon, cartItems);
 
+    const statusCode = !(response.error || '') ? 200 : 500;
+    res.status(statusCode).json(response);
+});
+
+
+app.post('/api/order/checkout', async (req, res) => {
+    const { user_id, discount_coupon, cartItems } = req.body;
+    const response = await checkout(user_id, discount_coupon, cartItems);
+
+    const statusCode = !(response.error || '') ? 200 : 500;
+    res.status(statusCode).json(response);
+});
+
+
+app.get('/api/order', async (req, res) => {
+    const { id } = req.query;
+    const response = await getOrdersFromID(id);
     const statusCode = !(response.error || '') ? 200 : 500;
     res.status(statusCode).json(response);
 });

@@ -96,7 +96,7 @@ const App = () => {
             <p className="text-gray-600 mb-2">{product.description}</p>
             <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
             <button
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+              className="mt-4 bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-500 transition-colors"
               onClick={() => addProductToCart(product)}
             >
               Add to Cart {cart[product.id]?.count > 0 ? `(${cart[product.id].count})` : ''}
@@ -112,10 +112,10 @@ const App = () => {
       <div className="container mx-auto px-4 py-8">
         <header className="flex justify-between items-center mb-8">
           <Link to="/">
-            <h1 className="text-3xl font-bold">Shoppers Point</h1>
+            <h1 className="text-3xl font-bold text-cyan-700">Shoppers Point</h1>
           </Link>
           <Link to="/cart" className="relative">
-            <FaShoppingCart className="text-2xl" />
+            <FaShoppingCart className="text-2xl text-cyan-700" />
             {getTotalCartItems() > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
                 {getTotalCartItems()}
