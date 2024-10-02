@@ -12,6 +12,7 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
 
     const navigate = useNavigate();
 
+    // Close the alert dialog, if the alert is success alert then Move to Homepage
     const closeAlert = () => {
         if (alert.show && !alert.isError) {
             navigate('/');
@@ -23,11 +24,18 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
     };
 
 
+    // Reset discount data in case if product count is updated or removed
+    // This needs to be done to prevent an edge-case:
+    //  - Add a lot of cart items
+    //  - Apply discount coupon to get huge discount
+    //  - Remove items from order, while keeping discounted amount
+     
     const resetDiscount = () => {
         setDiscountAmount(0);
         setDiscountMessage(``);
         setDiscountCode(``);
     };
+
 
     const updateProduct = (itemId, itemCount) => {
         updateQuantity(itemId, itemCount);

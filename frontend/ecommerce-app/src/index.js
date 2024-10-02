@@ -4,6 +4,8 @@ import './index.css';
 import App from './App';
 import { v4 as uuidv4 } from 'uuid';
 
+
+// Fetch the userId from local storage or generate once if not available
 export function getUserId() {
   let userId = localStorage.getItem('userId');
 

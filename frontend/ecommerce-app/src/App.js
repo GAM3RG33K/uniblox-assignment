@@ -9,6 +9,7 @@ const App = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState({});
 
+  
   const fetchCartItems = async (userId) => {
     const response = await fetchCart(userId);
     if (!response) {
@@ -31,7 +32,11 @@ const App = () => {
       if (cartItems) {
         const appCart = {};
         cartItems.forEach((product) => {
+
+          // If a product is already availble in the cart then skip
           if (appCart[product.id]) return;
+
+          // Add Product count to prevent duplication inside cart
           const productCount = cartItems.filter((p) => product.id === p.id).length;
           appCart[product.id] = {
             ...product,
