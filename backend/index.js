@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { products } = require('./src/db');
-const { addProductToCart, getCart, applyDiscount, checkout, getOrdersFromID } = require('./src/order_manager');
+const { addProductToCart, getCart, applyDiscount, checkout, getOrdersFromID, getAdminStatistics } = require('./src/order_manager');
 const lodash = require('lodash');
 const app = express();
 
@@ -11,6 +11,10 @@ const cors = require('cors');
 
 const corsOptions = {
     origin(origin, callback) {
+        // allow requests with no origin 
+        // (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
         if (origin === 'http://localhost:3000') {
             callback(null, true);
         } else {
@@ -87,6 +91,13 @@ app.get('/api/order', async (req, res) => {
     const statusCode = !(response.error || '') ? 200 : 500;
     res.status(statusCode).json(response);
 });
+
+app.get('/api/admin/stats', async (req, res) => {
+    const response = await getAdminStatistics();
+    const statusCode = !(response.error || '') ? 200 : 500;
+    res.status(statusCode).json(response);
+});
+
 
 const port = 9001;
 app.listen(port, async () => {

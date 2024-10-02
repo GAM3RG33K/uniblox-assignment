@@ -63,6 +63,41 @@ async function getCart(user_id) {
 };
 
 
+function extractOrderData(orders) {
+    let total_purchase_amount = 0;
+    let total_discount_amount = 0;
+    let total_items_purchased = 0;
+
+    orders.forEach(order => {
+        total_purchase_amount += order.subtotal;
+        total_discount_amount += order.discountAmount;
+
+        order.products.forEach(product => {
+            total_items_purchased += product.count;
+        });
+    });
+
+    return {
+        total_purchase_amount,
+        total_discount_amount,
+        total_items_purchased
+    };
+}
+
+async function getAdminStatistics() {
+
+    const allOrders = Object.values(orders).flat();
+
+    console.log(`getAdminStatistics: ${JSON.stringify(allOrders, 4)}`);
+
+    const extractedData = extractOrderData(allOrders);
+    return {
+        ...extractedData,
+        discount_codes: Array.from(discountCodes),
+    };
+};
+
+
 async function getOrdersForUser(user_id) {
 
     // check for authentication and valid product
@@ -208,4 +243,6 @@ async function checkout(user_id, discount_coupon, cartItems) {
     return { message: `Congratulations Order Placed!\n\nOrder ID: ${order_id}` };
 };
 
-module.exports = { addProductToCart, getCart, applyDiscount, checkout, getOrdersFromID };
+
+
+module.exports = { addProductToCart, getCart, applyDiscount, checkout, getOrdersFromID, getAdminStatistics };
