@@ -33,6 +33,7 @@ app.get('/', (req, res) => {
 });
 
 
+// API to fetch all available products from the product store
 app.get('/api/products', (req, res) => {
     const allProducts = lodash.cloneDeep(products);
 
@@ -42,14 +43,20 @@ app.get('/api/products', (req, res) => {
     });
 });
 
+
+// API to fetch cart data for the requesting user
 app.get('/api/cart', async (req, res) => {
     const { user_id } = req.query;
+
+    console.log(`incoming request /api/cart: ${req.query}`);
+
     const response = await getCart(user_id);
+
     const statusCode = (!response.error) ? 200 : 500;
+    console.log(`response on request /api/cart: ${statusCode == 200 ? statusCode: JSON.stringify(response)} `);
 
     if (statusCode == 200) {
         const cart = response.cart;
-        console.log(`total products in cart: ${cart.length}`)
         res.status(statusCode).json({
             cart,
             'count': cart.length,
@@ -59,42 +66,72 @@ app.get('/api/cart', async (req, res) => {
     }
 });
 
+// API to add product to cart for the requesting user
 app.post('/api/cart/add', async (req, res) => {
     const { user_id, product_id } = req.body;
-    const response = await addProductToCart(user_id, product_id);
 
+    console.log(`incoming request /api/cart/add: ${req.body}`);
+
+    const response = await addProductToCart(user_id, product_id);
     const statusCode = !(response.error || '') ? 200 : 500;
+
+    console.log(`response on request /api/cart/add: ${statusCode == 200 ? statusCode: JSON.stringify(response)} `);
+
     res.status(statusCode).json(response);
 });
 
+// API to apply discount coupon to current cart for the requesting user
 app.post('/api/order/apply-discount', async (req, res) => {
     const { user_id, discount_coupon, cartItems } = req.body;
-    const response = await applyDiscount(user_id, discount_coupon, cartItems);
 
+    console.log(`incoming request /api/order/apply-discount: ${req.body}`);
+
+    const response = await applyDiscount(user_id, discount_coupon, cartItems);
     const statusCode = !(response.error || '') ? 200 : 500;
+
+    console.log(`response on request /api/order/apply-discount: ${statusCode == 200 ? statusCode: JSON.stringify(response)} `);
+    
     res.status(statusCode).json(response);
 });
 
 
+// API to checkout cart items and convert into an order entry
 app.post('/api/order/checkout', async (req, res) => {
     const { user_id, discount_coupon, cartItems } = req.body;
-    const response = await checkout(user_id, discount_coupon, cartItems);
 
+    console.log(`incoming request /api/order/checkout: ${req.body}`);
+
+    const response = await checkout(user_id, discount_coupon, cartItems);
     const statusCode = !(response.error || '') ? 200 : 500;
+
+    console.log(`response on request /api/order/checkout: ${statusCode == 200 ? statusCode: JSON.stringify(response)} `);
+
     res.status(statusCode).json(response);
 });
 
 
+// API to Fetch order details for given order id
 app.get('/api/order', async (req, res) => {
     const { id } = req.query;
+
+    console.log(`incoming request /api/order: ${req.query}`);
+
     const response = await getOrdersFromID(id);
     const statusCode = !(response.error || '') ? 200 : 500;
+
+    console.log(`response on request /api/order: ${statusCode == 200 ? statusCode: JSON.stringify(response)} `);
     res.status(statusCode).json(response);
 });
 
+// API to fetch admin statistics
 app.get('/api/admin/stats', async (req, res) => {
+
+    console.log(`incoming request /api/admin/stats`);
+
     const response = await getAdminStatistics();
     const statusCode = !(response.error || '') ? 200 : 500;
+
+    console.log(`response on request /api/admin/stats: ${statusCode == 200 ? statusCode: JSON.stringify(response)} `);
     res.status(statusCode).json(response);
 });
 

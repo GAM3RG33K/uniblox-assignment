@@ -1,4 +1,5 @@
 
+// Types of discount
 const DISCOUNT_TYPE_FIXED = 'fixed';
 const DISCOUNT_TYPE_PERCENTAGE = 'percentage';
 
@@ -9,9 +10,10 @@ const discounts = {
 };
 
 
+// The number of minimum orders users need to place before avaialing any discounts
 const NTH_NUMBER = 3;
 
-// In-memory product store
+// In-memory product store, Place holder Data taken from the DummyJSON site
 const products = [{
     "id": 1,
     "title": "Essence Mascara Lash Princess",

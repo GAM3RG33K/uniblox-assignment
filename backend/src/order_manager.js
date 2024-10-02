@@ -7,7 +7,9 @@ const { products, discounts, DISCOUNT_TYPE_PERCENTAGE, NTH_NUMBER } = require('.
 const carts = {};
 const orders = {};
 
+// This provides list of all available discount codes
 const discountCodes = Object.keys(discounts);
+
 
 async function addProductToCart(user_id, product_id) {
 
@@ -23,12 +25,8 @@ async function addProductToCart(user_id, product_id) {
 
     // Update quantity
     carts[user_id][product_id] = (carts[user_id][product_id] || 0) + 1;
-
-    console.log(`${user_id} added ${product_id} into their cart!!!`);
     return { message: 'Product added to cart successfully' };
 };
-
-
 
 
 async function getCart(user_id) {
@@ -42,7 +40,6 @@ async function getCart(user_id) {
     const productsInCart = Object.keys(cartData);
 
     console.log(`${user_id} has ${productsInCart.length} unique products in their cart!`);
-
 
     const cart = [];
 
@@ -87,8 +84,6 @@ function extractOrderData(orders) {
 async function getAdminStatistics() {
 
     const allOrders = Object.values(orders).flat();
-
-    console.log(`getAdminStatistics: ${JSON.stringify(allOrders, 4)}`);
 
     const extractedData = extractOrderData(allOrders);
     return {
