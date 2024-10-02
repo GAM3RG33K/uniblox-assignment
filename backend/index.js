@@ -53,7 +53,7 @@ app.get('/api/cart', async (req, res) => {
     const response = await getCart(user_id);
 
     const statusCode = (!response.error) ? 200 : 500;
-    console.log(`response on request /api/cart: ${statusCode == 200 ? statusCode: JSON.stringify(response)} `);
+    console.log(`response on request /api/cart: ${statusCode == 200 ? statusCode : JSON.stringify(response)} `);
 
     if (statusCode == 200) {
         const cart = response.cart;
@@ -75,7 +75,7 @@ app.post('/api/cart/add', async (req, res) => {
     const response = await addProductToCart(user_id, product_id);
     const statusCode = !(response.error || '') ? 200 : 500;
 
-    console.log(`response on request /api/cart/add: ${statusCode == 200 ? statusCode: JSON.stringify(response)} `);
+    console.log(`response on request /api/cart/add: ${statusCode == 200 ? statusCode : JSON.stringify(response)} `);
 
     res.status(statusCode).json(response);
 });
@@ -89,8 +89,8 @@ app.post('/api/order/apply-discount', async (req, res) => {
     const response = await applyDiscount(user_id, discount_coupon, cartItems);
     const statusCode = !(response.error || '') ? 200 : 500;
 
-    console.log(`response on request /api/order/apply-discount: ${statusCode == 200 ? statusCode: JSON.stringify(response)} `);
-    
+    console.log(`response on request /api/order/apply-discount: ${statusCode == 200 ? statusCode : JSON.stringify(response)} `);
+
     res.status(statusCode).json(response);
 });
 
@@ -104,7 +104,7 @@ app.post('/api/order/checkout', async (req, res) => {
     const response = await checkout(user_id, discount_coupon, cartItems);
     const statusCode = !(response.error || '') ? 200 : 500;
 
-    console.log(`response on request /api/order/checkout: ${statusCode == 200 ? statusCode: JSON.stringify(response)} `);
+    console.log(`response on request /api/order/checkout: ${statusCode == 200 ? statusCode : JSON.stringify(response)} `);
 
     res.status(statusCode).json(response);
 });
@@ -119,7 +119,7 @@ app.get('/api/order', async (req, res) => {
     const response = await getOrdersFromID(id);
     const statusCode = !(response.error || '') ? 200 : 500;
 
-    console.log(`response on request /api/order: ${statusCode == 200 ? statusCode: JSON.stringify(response)} `);
+    console.log(`response on request /api/order: ${statusCode == 200 ? statusCode : JSON.stringify(response)} `);
     res.status(statusCode).json(response);
 });
 
@@ -131,14 +131,14 @@ app.get('/api/admin/stats', async (req, res) => {
     const response = await getAdminStatistics();
     const statusCode = !(response.error || '') ? 200 : 500;
 
-    console.log(`response on request /api/admin/stats: ${statusCode == 200 ? statusCode: JSON.stringify(response)} `);
+    console.log(`response on request /api/admin/stats: ${statusCode == 200 ? statusCode : JSON.stringify(response)} `);
     res.status(statusCode).json(response);
 });
 
 
 const port = 9001;
-app.listen(port, async () => {
+const server = app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
 
-module.exports = app;
+module.exports = { app, server };

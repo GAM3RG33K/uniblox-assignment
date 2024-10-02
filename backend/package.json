@@ -4,7 +4,8 @@
   "description": "A demo of working implementation of the assignment provided here: https://github.com/neustackapp/assignment/blob/main/README.md",
   "main": "index.js",
   "scripts": {
-    "start": "node --watch index.js"
+    "start": "node --watch index.js",
+    "test": "jest"
   },
   "author": "",
   "license": "MIT",
@@ -14,5 +15,9 @@
     "express": "^4.21.0",
     "lodash": "^4.17.21",
     "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
   }
 }
